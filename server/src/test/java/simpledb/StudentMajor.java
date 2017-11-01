@@ -1,7 +1,8 @@
 package simpledb;
 
-import java.sql.*;
 import simpledb.remote.SimpleDriver;
+
+import java.sql.*;
 
 public class StudentMajor {
     public static void main(String[] args) {

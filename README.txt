@@ -1,5 +1,5 @@
-## This is a Gradle project now. All paths and dependencies are setup.
-## Simply Refresh gradle and it's ready to run.
+This is a Gradle project now, because maven is not good enough. All paths and dependencies are setup.
+Simply Refresh gradle and it's ready to run.
 
 
 Update: I've incorporated the changes from SimpleDB-2.10. There are now

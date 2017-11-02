@@ -6,7 +6,6 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Map;
 
 public class Startup {
     protected void startRMIRegistery(int port) {

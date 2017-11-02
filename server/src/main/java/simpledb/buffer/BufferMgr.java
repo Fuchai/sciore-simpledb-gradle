@@ -135,4 +135,8 @@ public class BufferMgr {
      return this.bufferMgr.getBuffers();
    }
 
+
+   public void setClockHand(int clockHand) {
+      bufferMgr.setClockHand(clockHand);
+   }
 }

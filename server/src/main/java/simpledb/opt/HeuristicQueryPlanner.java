@@ -2,7 +2,6 @@ package simpledb.opt;
 
 import simpledb.tx.Transaction;
 import simpledb.query.*;
-import simpledb.opt.TablePlanner;
 import simpledb.parse.QueryData;
 import simpledb.planner.QueryPlanner;
 import java.util.*;

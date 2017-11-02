@@ -1,8 +1,11 @@
 package simpledb;
 
-import java.sql.*;
 import simpledb.remote.SimpleDriver;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.sql.*;
 
 public class SQLInterpreter {
     private static Connection conn = null;

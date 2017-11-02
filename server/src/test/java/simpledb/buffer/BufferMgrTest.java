@@ -1,8 +1,7 @@
 package simpledb.buffer;
 
-import simpledb.server.SimpleDB;
 import simpledb.file.Block;
-import simpledb.buffer.*;
+import simpledb.server.SimpleDB;
 
 public class BufferMgrTest {
 	public static void main(String[] args) throws Exception {

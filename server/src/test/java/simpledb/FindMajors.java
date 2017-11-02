@@ -1,7 +1,8 @@
 package simpledb;
 
-import java.sql.*;
 import simpledb.remote.SimpleDriver;
+
+import java.sql.*;
 
 public class FindMajors {
     public static void main(String[] args) {

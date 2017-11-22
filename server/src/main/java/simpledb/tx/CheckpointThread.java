@@ -6,7 +6,7 @@ import simpledb.tx.recovery.CheckpointRecord;
 public class CheckpointThread implements Runnable {
 
     static boolean inProgress=false;
-    static boolean transactionLockacquired =false;
+    public static boolean checkpointLockAcquired =false;
     static Object checkpointLock = new Object();
 
 //    private static Lock checkpointLock = new ReentrantLock();
@@ -21,6 +21,7 @@ public class CheckpointThread implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                checkpointLockAcquired=true;
                 // Flush all is automatic if we wait for all the transactions to finish
                 // When commit or rollback happen
 
@@ -33,6 +34,7 @@ public class CheckpointThread implements Runnable {
                 }
             }
         }
+        checkpointLockAcquired=false;
     }
 
 //    public static Condition getNoActive() {
@@ -46,7 +48,6 @@ public class CheckpointThread implements Runnable {
     public static Object getCheckpointLock() {
         return checkpointLock;
     }
-
 
     public static void setInProgress(boolean inProgress) {
         CheckpointThread.inProgress = inProgress;

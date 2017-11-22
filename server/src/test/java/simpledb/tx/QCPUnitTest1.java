@@ -1,5 +1,6 @@
 package simpledb.tx;
 
+import org.junit.Assert;
 import simpledb.server.SimpleDB;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class QCPUnitTest1 {
         }
         System.out.println("10 transactions");
         assert CheckpointThread.isInProgress()==true;
-        assert CheckpointThread.transactionLockacquired==false;
+        assert CheckpointThread.checkpointLockAcquired ==false;
         //Quiescent started. Algorithm does not run, since there are active trans.
         for (int i=0;i<5;i++){
             txs.add(new Transaction());
@@ -27,14 +28,16 @@ public class QCPUnitTest1 {
             t.commit();
         }
         //Quiescent should run.
-        TimeUnit.SECONDS.sleep(2);
-
-        //wait a second
-        TimeUnit.SECONDS.sleep(2);
+        Assert.assertTrue(CheckpointThread.checkpointLockAcquired);
+        TimeUnit.SECONDS.sleep(1);
 
         for (Transaction t: txs.subList(10,15)){
             t.commit();
         }
+
+
+        Assert.assertFalse(CheckpointThread.checkpointLockAcquired);
+        Assert.assertFalse(CheckpointThread.isInProgress());
 
 
         System.out.println("passed");

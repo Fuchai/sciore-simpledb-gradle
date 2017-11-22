@@ -21,6 +21,7 @@ public class Transaction {
     private ConcurrencyMgr concurMgr;
     private int txnum;
     private BufferList myBuffers = new BufferList();
+    private static Object transactionLock =new Object();
     // Java uses pointers.
     // Why numbers if you have pointers to identify the Transactions?
     private static Vector currentlyActiveTransactions=new Vector<Transaction>();
@@ -39,18 +40,20 @@ public class Transaction {
      * is called first.
      */
     public Transaction() {
-        synchronized (QuiescentCheckpointThread.getTransactionLock()){
+        synchronized (transactionLock){
             // To preserve liveness of parallel transaction constructors,
             // this block is empty.
-        }
-        txnum       = nextTxNumber();
-        recoveryMgr = new RecoveryMgr(txnum);
-        concurMgr   = new ConcurrencyMgr();
-        currentlyActiveTransactions.add(this);
-        QuiescentCounter++;
-        if (QuiescentCounter%10==0){
-            QuiescentCheckpointThread.setInProgress(true);
-            new QuiescentCheckpointThread().run();
+            txnum       = nextTxNumber();
+            recoveryMgr = new RecoveryMgr(txnum);
+            concurMgr   = new ConcurrencyMgr();
+            currentlyActiveTransactions.add(this);
+            QuiescentCounter++;
+            if (QuiescentCounter%10==0){
+                CheckpointThread.setInProgress(true);
+                CheckpointThread qct1=new CheckpointThread();
+                Thread thre=new Thread(qct1);
+                thre.start();
+            }
         }
     }
 
@@ -89,7 +92,7 @@ public class Transaction {
      */
     private void QuiescentFinal() {
         currentlyActiveTransactions.remove(this);
-        QuiescentCheckpointThread.getNoActive().signal();
+        CheckpointThread.getCheckpointLock().notifyAll();
     }
 
     /**
@@ -237,5 +240,9 @@ public class Transaction {
 
     public int getTxnum() {
         return txnum;
+    }
+
+    public static Object getTransactionLock() {
+        return transactionLock;
     }
 }

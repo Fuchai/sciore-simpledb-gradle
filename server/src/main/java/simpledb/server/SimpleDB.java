@@ -1,11 +1,11 @@
 package simpledb.server;
 
+import simpledb.buffer.BufferMgr;
 import simpledb.file.FileMgr;
-import simpledb.buffer.*;
-import simpledb.tx.Transaction;
 import simpledb.log.LogMgr;
 import simpledb.metadata.MetadataMgr;
 import simpledb.planner.*;
+import simpledb.tx.Transaction;
 
 /**
  * The class that provides system-wide static global values.
@@ -28,7 +28,7 @@ public class SimpleDB {
    private static BufferMgr   bm;
    private static LogMgr      logm;
    private static MetadataMgr mdm;
-   
+
    /**
     * Initializes the system.
     * This method is called during system startup.

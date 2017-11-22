@@ -3,17 +3,14 @@ package simpledb.tx;
 import simpledb.server.SimpleDB;
 import simpledb.tx.recovery.CheckpointRecord;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 public class CheckpointThread implements Runnable {
 
     static boolean inProgress=false;
     static boolean transactionLockacquired =false;
+    static Object checkpointLock = new Object();
 
-    private static Lock checkpointLock = new ReentrantLock();
-    private static Condition noActive= checkpointLock.newCondition();
+//    private static Lock checkpointLock = new ReentrantLock();
+//    private static Condition noActive= checkpointLock.newCondition();
 
     public void run(){
         inProgress=true;
@@ -31,60 +28,22 @@ public class CheckpointThread implements Runnable {
                 SimpleDB.logMgr().flush(lsn);
 
                 inProgress=false;
-                Transaction.getTransactionLock().notifyAll();
+                synchronized (Transaction.getTransactionLock()) {
+                    Transaction.getTransactionLock().notifyAll();
+                }
             }
         }
-
-
-//
-//
-//        // when a quiescent checkpoint started running, Quiescent Lock is acquired
-//        // so no new transactions can be initated
-//        synchronized (transactionLock){
-//            // TLock acquired, stop accepting new transactions.
-//            transactionLockacquired=true;
-//
-////            // Implemented with better technology.
-////            // Lock the checkpointLock. Wait until there's no active transaction.
-//            checkpointLock.lock();
-//
-//
-//            try{
-//                while(!Transaction.getCurrentlyActiveTransactions().isEmpty()){
-//                    noActive.await();
-//                }
-//                // Now there are no active transaction. Lock acquired.
-//                // Since transactionLock is also on, there is no new transaction from now on.
-//
-//                // Flush all is automatic if we wait for all the transactions to finish
-//                // When commit or rollback happen
-//
-//                int lsn = new CheckpointRecord().writeToLog();
-//                SimpleDB.logMgr().flush(lsn);
-//
-//                inProgress=false;
-//
-//                // no need for notifyall(), since synchronized does the same
-//
-//            }catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }finally {
-////                checkpointLock.unlock();
-//            }
-//        }
-//        transactionLockacquired=false;
-//        System.out.println("QCT finished");
     }
 
-    public static Condition getNoActive() {
-        return noActive;
-    }
+//    public static Condition getNoActive() {
+//        return noActive;
+//    }
 
     public static boolean isInProgress() {
         return inProgress;
     }
 
-    public static Lock getCheckpointLock() {
+    public static Object getCheckpointLock() {
         return checkpointLock;
     }
 

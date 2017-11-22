@@ -89,10 +89,13 @@ public class Transaction {
 
     /**
      * Added for Quiescent checkpoint.
+     * Notify checkpoint lock, which makes sure no active transactions are running
      */
     private void QuiescentFinal() {
         currentlyActiveTransactions.remove(this);
-        CheckpointThread.getCheckpointLock().notifyAll();
+        synchronized (CheckpointThread.getCheckpointLock()){
+            CheckpointThread.getCheckpointLock().notifyAll();
+        }
     }
 
     /**

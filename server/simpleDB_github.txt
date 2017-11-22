@@ -1,0 +1,1 @@
+https://github.com/Fuchai/sciore-simpledb-gradle

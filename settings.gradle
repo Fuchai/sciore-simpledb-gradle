@@ -15,4 +15,5 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'sciore-simpledb-maven-mod'
+rootProject.name = 'sciore-simpledb-gradle'
+include 'server'

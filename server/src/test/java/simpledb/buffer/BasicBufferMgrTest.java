@@ -68,6 +68,7 @@ public class BasicBufferMgrTest {
         result = instance.getBuffers()[1].block().number();
         assertEquals(expectedResult, result);
     }
+
     /**
      * Test of FIFO Buffer selection strategy, of class BasicBufferMgr.
      */
@@ -86,6 +87,7 @@ public class BasicBufferMgrTest {
         result = instance.getBuffers()[2].block().number();
         assertEquals(expectedResult, result);
     }
+
     /**
      * Test of LRU Buffer selection strategy, of class BasicBufferMgr.
      */
@@ -104,6 +106,7 @@ public class BasicBufferMgrTest {
         result = instance.getBuffers()[0].block().number();
         assertEquals(expectedResult, result);
     }
+
     /**
      * Test of Clock Buffer selection strategy, of class BasicBufferMgr.
      */
@@ -129,6 +132,7 @@ public class BasicBufferMgrTest {
         result = instance.getBuffers()[3].block().number();
         assertEquals(expectedResult, result);
     }
+
     /**
      * Test of flushAll method, of class BasicBufferMgr.
      */

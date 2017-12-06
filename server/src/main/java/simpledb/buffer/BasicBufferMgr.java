@@ -10,8 +10,8 @@ import java.util.Queue;
 
 /**
  * Manages the pinning and unpinning of buffers to blocks.
- * @author Edward Sciore
  *
+ * @author Edward Sciore
  */
 class BasicBufferMgr {
     private Buffer[] bufferpool;
@@ -20,7 +20,7 @@ class BasicBufferMgr {
     private int numbuffs;
     private Queue<Buffer> FIFO;
     private Queue<Buffer> LRU;
-    private int clockHand =0;
+    private int clockHand = 0;
 
     /**
      * Creates a buffer manager having the specified number
@@ -33,23 +33,25 @@ class BasicBufferMgr {
      * Thus this constructor cannot be called until
      * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
      * is called first.
+     *
      * @param numbuffs the number of buffer slots to allocate
      */
     BasicBufferMgr(int numbuffs) {
-        this.numbuffs=numbuffs;
+        this.numbuffs = numbuffs;
         bufferpool = new Buffer[numbuffs];
         numAvailable = numbuffs;
         FIFO = new LinkedList<>();
-        for (int i=0; i<numbuffs; i++) {
-            Buffer buff=new Buffer();
+        for (int i = 0; i < numbuffs; i++) {
+            Buffer buff = new Buffer();
             bufferpool[i] = buff;
             FIFO.add(buff);
         }
-        LRU= new LinkedList(Arrays.asList(bufferpool));
+        LRU = new LinkedList(Arrays.asList(bufferpool));
     }
 
     /**
      * Flushes the dirty buffers modified by the specified transaction.
+     *
      * @param txnum the transaction's id number
      */
     synchronized void flushAll(int txnum) {
@@ -64,6 +66,7 @@ class BasicBufferMgr {
      * then that buffer is used;
      * otherwise, an unpinned buffer from the pool is chosen.
      * Returns a null value if there are no available buffers.
+     *
      * @param blk a reference to a disk block
      * @return the pinned buffer
      */
@@ -75,11 +78,11 @@ class BasicBufferMgr {
                 return null;
             buff.assignToBlock(blk);
         }
-        if (!buff.isPinned()){
+        if (!buff.isPinned()) {
             FIFO.remove(buff);
             FIFO.add(buff);
             numAvailable--;
-        }else{
+        } else {
             FIFO.remove(buff);
             FIFO.add(buff);
         }
@@ -92,8 +95,9 @@ class BasicBufferMgr {
      * pins a buffer to it.
      * Returns null (without allocating the block) if
      * there are no available buffers.
+     *
      * @param filename the name of the file
-     * @param fmtr a pageformatter object, used to format the new block
+     * @param fmtr     a pageformatter object, used to format the new block
      * @return the pinned buffer
      */
     synchronized Buffer pinNew(String filename, PageFormatter fmtr) {
@@ -110,19 +114,21 @@ class BasicBufferMgr {
 
     /**
      * Unpins the specified buffer.
+     *
      * @param buff the buffer to be unpinned
      */
     synchronized void unpin(Buffer buff) {
         buff.unpin();
         LRU.remove(buff);
         LRU.add(buff);
-        if (!buff.isPinned()){
+        if (!buff.isPinned()) {
             numAvailable++;
         }
     }
 
     /**
      * Returns the number of available (i.e. unpinned) buffers.
+     *
      * @return the number of available buffers
      */
     int available() {
@@ -152,21 +158,26 @@ class BasicBufferMgr {
                 return null;
         }
     }
+
     /**
      * @return Allocated buffers
      */
     public Buffer[] getBuffers() {
         return this.bufferpool;
     }
+
     /**
      * Set buffer selection strategy
+     *
      * @param s (0 - Naive, 1 - FIFO, 2 - LRU, 3 - Clock)
      */
     public void setStrategy(int s) {
         this.strategy = s;
     }
+
     /**
      * Naive buffer selection strategy
+     *
      * @return
      */
     private Buffer useNaiveStrategy() {
@@ -175,18 +186,20 @@ class BasicBufferMgr {
                 return buff;
         return null;
     }
+
     /**
      * FIFO buffer selection strategy
      * First buffer that gets pinned will be first out. Note that buffer that gets
      * pinned does not become available. When a buffer gets freed, the date when
      * it gets pinned then becomes significant.
+     *
      * @return
      */
     private Buffer useFIFOStrategy() {
-        Iterator<Buffer> it=FIFO.iterator();
-        while(it.hasNext()){
-            Buffer buff=it.next();
-            if (!buff.isPinned()){
+        Iterator<Buffer> it = FIFO.iterator();
+        while (it.hasNext()) {
+            Buffer buff = it.next();
+            if (!buff.isPinned()) {
                 it.remove();
                 return buff;
             }
@@ -196,28 +209,31 @@ class BasicBufferMgr {
 
     /**
      * LRU buffer selection strategy
+     *
      * @return
      */
     private Buffer useLRUStrategy() {
         return LRU.remove();
     }
+
     /**
      * Clock buffer selection strategy
+     *
      * @return
      */
     private Buffer useClockStrategy() {
-        int start= clockHand;
+        int start = clockHand;
         do {
-            if (!bufferpool[clockHand].isPinned()){
+            if (!bufferpool[clockHand].isPinned()) {
                 return bufferpool[clockHand];
             }
 
-            if (clockHand <this.numbuffs-1){
+            if (clockHand < this.numbuffs - 1) {
                 clockHand++;
-            }else {
-                clockHand =0;
+            } else {
+                clockHand = 0;
             }
-        } while(clockHand !=start);
+        } while (clockHand != start);
         return null;
     }
 

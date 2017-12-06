@@ -5,36 +5,36 @@ import simpledb.tx.recovery.CheckpointRecord;
 
 public class CheckpointThread implements Runnable {
 
-    static boolean inProgress=false;
-    public static boolean checkpointLockAcquired =false;
+    static boolean inProgress = false;
+    public static boolean checkpointLockAcquired = false;
     static Object checkpointLock = new Object();
 
 //    private static Lock checkpointLock = new ReentrantLock();
 //    private static Condition noActive= checkpointLock.newCondition();
 
-    public void run(){
-        inProgress=true;
-        synchronized (checkpointLock){
-            while (!Transaction.getCurrentlyActiveTransactions().isEmpty()){
+    public void run() {
+        inProgress = true;
+        synchronized (checkpointLock) {
+            while (!Transaction.getCurrentlyActiveTransactions().isEmpty()) {
                 try {
                     checkpointLock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                checkpointLockAcquired=true;
+                checkpointLockAcquired = true;
                 // Flush all is automatic if we wait for all the transactions to finish
                 // When commit or rollback happen
 
                 int lsn = new CheckpointRecord().writeToLog();
                 SimpleDB.logMgr().flush(lsn);
 
-                inProgress=false;
+                inProgress = false;
                 synchronized (Transaction.getTransactionLock()) {
                     Transaction.getTransactionLock().notifyAll();
                 }
             }
         }
-        checkpointLockAcquired=false;
+        checkpointLockAcquired = false;
     }
 
 //    public static Condition getNoActive() {

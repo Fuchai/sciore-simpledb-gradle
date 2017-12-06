@@ -36,8 +36,8 @@ public class Startup {
             port = Integer.parseInt(args[1]);
         }
 
-        System.out.println("Starting up server - "+dbFileName+":"+port);
-        new Startup(dbFileName,port);
+        System.out.println("Starting up server - " + dbFileName + ":" + port);
+        new Startup(dbFileName, port);
     }
 
     public Startup(String dbFileName, int port) throws Exception {
@@ -49,7 +49,7 @@ public class Startup {
 
         // post the server entry in the rmi registry
         RemoteDriver d = new RemoteDriverImpl();
-        Naming.rebind("//localhost:"+port+"/simpledb", d);
+        Naming.rebind("//localhost:" + port + "/simpledb", d);
 
         System.out.println("database server ready");
     }

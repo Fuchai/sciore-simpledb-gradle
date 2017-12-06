@@ -10,8 +10,8 @@ public class QCPUnitTest2 {
     public static void main(String[] args) throws Exception {
         SimpleDB.init("studentdb");
 
-        ArrayList<Transaction> txs=new ArrayList<>();
-        for (int i = 0; i<15; i++){
+        ArrayList<Transaction> txs = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
             txs.add(new Transaction());
         }
 
@@ -19,14 +19,14 @@ public class QCPUnitTest2 {
 
         Assert.assertTrue(CheckpointThread.isInProgress());
 
-        for (Transaction t: txs.subList(0,10)){
+        for (Transaction t : txs.subList(0, 10)) {
             t.commit();
         }
         //Quiescent should run.
         Assert.assertTrue(CheckpointThread.checkpointLockAcquired);
         TimeUnit.SECONDS.sleep(1);
 
-        for (Transaction t: txs.subList(10,15)){
+        for (Transaction t : txs.subList(10, 15)) {
             t.commit();
         }
 

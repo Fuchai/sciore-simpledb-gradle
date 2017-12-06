@@ -12,20 +12,21 @@ import java.util.Vector;
  * Provides transaction management for clients,
  * ensuring that all transactions are serializable, recoverable,
  * and in general satisfy the ACID properties.
+ *
  * @author Edward Sciore
  */
 public class Transaction {
     private static int nextTxNum = 0;
     private static final int END_OF_FILE = -1;
-    private RecoveryMgr    recoveryMgr;
+    private RecoveryMgr recoveryMgr;
     private ConcurrencyMgr concurMgr;
     private int txnum;
     private BufferList myBuffers = new BufferList();
-    private static Object transactionLock =new Object();
+    private static Object transactionLock = new Object();
     // Java uses pointers.
     // Why numbers if you have pointers to identify the Transactions?
-    private static Vector currentlyActiveTransactions=new Vector<Transaction>();
-    private static int QuiescentCounter=0;
+    private static Vector currentlyActiveTransactions = new Vector<Transaction>();
+    private static int QuiescentCounter = 0;
 
     /**
      * Creates a new transaction and its associated
@@ -40,18 +41,18 @@ public class Transaction {
      * is called first.
      */
     public Transaction() {
-        synchronized (transactionLock){
+        synchronized (transactionLock) {
             // To preserve liveness of parallel transaction constructors,
             // this block is empty.
-            txnum       = nextTxNumber();
+            txnum = nextTxNumber();
             recoveryMgr = new RecoveryMgr(txnum);
-            concurMgr   = new ConcurrencyMgr();
+            concurMgr = new ConcurrencyMgr();
             currentlyActiveTransactions.add(this);
             QuiescentCounter++;
-            if (QuiescentCounter%10==0){
+            if (QuiescentCounter % 10 == 0) {
                 CheckpointThread.setInProgress(true);
-                CheckpointThread qct1=new CheckpointThread();
-                Thread thre=new Thread(qct1);
+                CheckpointThread qct1 = new CheckpointThread();
+                Thread thre = new Thread(qct1);
                 thre.start();
             }
         }
@@ -93,7 +94,7 @@ public class Transaction {
      */
     private void QuiescentFinal() {
         currentlyActiveTransactions.remove(this);
-        synchronized (CheckpointThread.getCheckpointLock()){
+        synchronized (CheckpointThread.getCheckpointLock()) {
             CheckpointThread.getCheckpointLock().notifyAll();
         }
     }
@@ -114,6 +115,7 @@ public class Transaction {
     /**
      * Pins the specified block.
      * The transaction manages the buffer for the client.
+     *
      * @param blk a reference to the disk block
      */
     public void pin(Block blk) {
@@ -124,6 +126,7 @@ public class Transaction {
      * Unpins the specified block.
      * The transaction looks up the buffer pinned to this block,
      * and unpins it.
+     *
      * @param blk a reference to the disk block
      */
     public void unpin(Block blk) {
@@ -135,7 +138,8 @@ public class Transaction {
      * specified offset of the specified block.
      * The method first obtains an SLock on the block,
      * then it calls the buffer to retrieve the value.
-     * @param blk a reference to a disk block
+     *
+     * @param blk    a reference to a disk block
      * @param offset the byte offset within the block
      * @return the integer stored at that offset
      */
@@ -150,7 +154,8 @@ public class Transaction {
      * specified offset of the specified block.
      * The method first obtains an SLock on the block,
      * then it calls the buffer to retrieve the value.
-     * @param blk a reference to a disk block
+     *
+     * @param blk    a reference to a disk block
      * @param offset the byte offset within the block
      * @return the string stored at that offset
      */
@@ -169,9 +174,10 @@ public class Transaction {
      * writes that record to the log.
      * Finally, it calls the buffer to store the value,
      * passing in the LSN of the log record and the transaction's id.
-     * @param blk a reference to the disk block
+     *
+     * @param blk    a reference to the disk block
      * @param offset a byte offset within that block
-     * @param val the value to be stored
+     * @param val    the value to be stored
      */
     public void setInt(Block blk, int offset, int val) {
         concurMgr.xLock(blk);
@@ -189,9 +195,10 @@ public class Transaction {
      * writes that record to the log.
      * Finally, it calls the buffer to store the value,
      * passing in the LSN of the log record and the transaction's id.
-     * @param blk a reference to the disk block
+     *
+     * @param blk    a reference to the disk block
      * @param offset a byte offset within that block
-     * @param val the value to be stored
+     * @param val    the value to be stored
      */
     public void setString(Block blk, int offset, String val) {
         concurMgr.xLock(blk);
@@ -205,6 +212,7 @@ public class Transaction {
      * This method first obtains an SLock on the
      * "end of the file", before asking the file manager
      * to return the file size.
+     *
      * @param filename the name of the file
      * @return the number of blocks in the file
      */
@@ -219,8 +227,9 @@ public class Transaction {
      * and returns a reference to it.
      * This method first obtains an XLock on the
      * "end of the file", before performing the append.
+     *
      * @param filename the name of the file
-     * @param fmtr the formatter used to initialize the new page
+     * @param fmtr     the formatter used to initialize the new page
      * @return a reference to the newly-created disk block
      */
     public Block append(String filename, PageFormatter fmtr) {

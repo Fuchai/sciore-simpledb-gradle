@@ -5,6 +5,8 @@ import org.junit.Test;
 import simpledb.server.SimpleDB;
 import simpledb.tx.Transaction;
 
+import static org.junit.Assert.assertEquals;
+
 public class SemijoinScanTest {
 
     @Before
@@ -34,5 +36,8 @@ public class SemijoinScanTest {
             System.out.println();
             records++;
         }
+        assertEquals(9, records);
+
     }
+
 }

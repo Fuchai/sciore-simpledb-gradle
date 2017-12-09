@@ -2,19 +2,22 @@ package simpledb.query;
 
 import simpledb.record.Schema;
 
+import java.util.Collection;
+
 public class RenamePlan implements Plan{
     private Plan p;
-    private String[] fields;
+    private Collection<String> fields;
     private String oldName;
     private String newName;
     private Schema schema=new Schema();
 
-    public RenamePlan(Plan p, String[] fields, String oldName, String newName) {
+    public RenamePlan(Plan p, String oldName, String newName) {
         this.p = p;
-        this.fields = fields;
         this.oldName = oldName;
         this.newName = newName;
         Schema oldSchmea=p.schema();
+
+        this.fields = oldSchmea.fields();
 
         for (String fldname : fields) {
             if (fldname.equals(oldName)) {

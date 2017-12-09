@@ -1,12 +1,14 @@
 package simpledb.query;
 
+import java.util.Collection;
+
 public class RenameScan implements Scan {
     private Scan s;
-    private String[] fields;
+    private Collection<String> fields;
     private String oldName;
     private String newName;
 
-    public RenameScan(Scan s, String[] fields, String oldName, String newName) {
+    public RenameScan(Scan s, Collection<String> fields, String oldName, String newName) {
         this.s=s;
         this.fields=fields;
         this.oldName=oldName;

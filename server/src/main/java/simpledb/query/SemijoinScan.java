@@ -1,62 +1,53 @@
 package simpledb.query;
 
-public class SemijoinScan implements Scan {
-    private Scan s1, s2;
-    private Predicate predicate;
+public class SemijoinScan implements Scan{
+    private Scan prod;
+    private Predicate pred;
 
-    public SemijoinScan(Scan s1, Scan s2, Predicate predicate) {
-        this.s1 = s1;
-        this.s2 = s2;
-        this.predicate = predicate;
+    public SemijoinScan(Scan s1, Scan s2, Predicate pred) {
+        this.prod = new ProductScan(s1, s2);
+        this.pred = pred;
     }
 
-    @Override
     public void beforeFirst() {
-        s1.beforeFirst();
+        prod.beforeFirst();
     }
 
-    /**
-     * Move the cursor to the next semijoin value.
-     * @return
-     */
-    @Override
     public boolean next() {
-        s2.beforeFirst();
-        while(s1.next()) {
-            while (s2.next()) {
-                if (predicate.isSatisfied(this)) {
-                    return true;
-                    // next time the function is called, a new lhs will be used,
-                    // and s2 will be as new.
-                }
-            }
-        }
+        while (prod.next())
+            if (pred.isSatisfied(prod))
+                return true;
         return false;
     }
 
-    @Override
     public void close() {
-        s1.close();
-        s2.close();
+        prod.close();
     }
 
-    @Override
     public Constant getVal(String fldname) {
-        return s1.getVal(fldname);
+        if (hasField(fldname)) {
+            return prod.getVal(fldname);
+        } else {
+            throw new RuntimeException("field " + fldname + " not found.");
+        }
     }
-
-    @Override
     public int getInt(String fldname) {
-        return s1.getInt(fldname);
+        if (hasField(fldname)) {
+            return prod.getInt(fldname);
+        } else {
+            throw new RuntimeException("field " + fldname + " not found.");
+        }
     }
 
-    @Override
     public String getString(String fldname) {
-        return s1.getString(fldname);
+        if (hasField(fldname)) {
+            return prod.getString(fldname);
+        } else {
+            throw new RuntimeException("field " + fldname + " not found.");
+        }
     }
 
-    @Override
     public boolean hasField(String fldname) {
-        return s1.hasField(fldname);
+        return prod.hasField(fldname);
     }
 }

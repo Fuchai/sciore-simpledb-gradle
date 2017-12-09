@@ -21,6 +21,15 @@ public class ProductScan implements Scan {
         s1.next();
     }
 
+    public Scan getS2() {
+        return s2;
+    }
+
+    public Scan getS1() {
+
+        return s1;
+    }
+
     /**
      * Positions the scan before its first record.
      * In other words, the LHS scan is positioned at

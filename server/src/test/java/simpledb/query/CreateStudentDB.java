@@ -5,7 +5,6 @@ import simpledb.tx.Transaction;
 
 /**
  * Create serverless studentdb
- *
  * @author yasiro01
  */
 public class CreateStudentDB {
